@@ -1,0 +1,35 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Tweets" %>
+
+<h1>Tweets</h1>
+
+<%= form_with url: tweets_path, method: :get, local: true do |form| %>
+ <%= form.text_field :query_text, placeholder: "BUSCA REGISTROS...", value: params[:query_text]%>
+ br                 
+  <%= submit_tag "Buscar" %>
+<%end%>
+
+<div id="tweets">
+  <% @tweets.each do |tweet| %>
+    <%= render tweet %>
+    <p>
+      <%= link_to "Show this tweet", tweet %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New tweet", new_tweet_path %>
+
+<%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+
+def index
+    if params[:query_text].present?
+      # Si hay una búsqueda, usa el método de búsqueda con paginación
+      @pagy, @tweets = pagy(Tweet.search_full_text(params[:query_text]))
+    else
+      # Si no hay búsqueda, lista todos los tweets con paginación
+      @pagy, @tweets = pagy(Tweet.all)
+    end
+  end
+
